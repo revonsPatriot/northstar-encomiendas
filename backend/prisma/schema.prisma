@@ -1,0 +1,151 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN_CENTRAL
+  ENCARGADO_SUCURSAL
+  OPERADOR
+}
+
+enum ShipmentStatus {
+  REGISTRADO
+  EN_TRANSITO
+  EN_SUCURSAL_DESTINO
+  ENTREGADO
+  ANULADO
+}
+
+enum PaymentType {
+  PAGADO_ORIGEN
+  POR_PAGAR
+  CUENTA_CORPORATIVA
+}
+
+model Branch {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  name        String
+  department  String
+  address     String
+  phones      String?
+  isOwnOffice Boolean  @default(true)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  users                User[]
+  originShipments      Shipment[]          @relation("OriginBranch")
+  destinationShipments Shipment[]          @relation("DestinationBranch")
+  statusLogs           ShipmentStatusLog[]
+
+  @@map("branches")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  branchId     String
+  branch       Branch   @relation(fields: [branchId], references: [id])
+  fullName     String
+  ci           String   @unique
+  role         UserRole @default(OPERADOR)
+  passwordHash String
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  dispatchedShipments Shipment[]          @relation("DispatchedByUser")
+  deliveredShipments  Shipment[]          @relation("DeliveredByUser")
+  statusLogs          ShipmentStatusLog[]
+
+  @@map("users")
+}
+
+model Customer {
+  id                   String   @id @default(uuid())
+  ciNit                String?  @unique
+  fullName             String
+  phone                String?
+  isCorporateAccount   Boolean  @default(false)
+  corporateCreditLimit Decimal  @default(0.00) @db.Decimal(10, 2)
+  createdAt            DateTime @default(now())
+
+  sentShipments     Shipment[] @relation("SenderCustomer")
+  receivedShipments Shipment[] @relation("ConsigneeCustomer")
+
+  @@index([ciNit])
+  @@index([phone])
+  @@map("customers")
+}
+
+model Shipment {
+  id          String @id @default(uuid())
+  guideNumber String @unique
+
+  originBranchId      String
+  originBranch        Branch @relation("OriginBranch", fields: [originBranchId], references: [id])
+  destinationBranchId String
+  destinationBranch   Branch @relation("DestinationBranch", fields: [destinationBranchId], references: [id])
+
+  senderId    String
+  sender      Customer @relation("SenderCustomer", fields: [senderId], references: [id])
+  consigneeId String
+  consignee   Customer @relation("ConsigneeCustomer", fields: [consigneeId], references: [id])
+
+  status      ShipmentStatus @default(REGISTRADO)
+  paymentType PaymentType
+  isPaid      Boolean        @default(false)
+  totalAmount Decimal        @db.Decimal(10, 2)
+
+  dispatchedByUserId String
+  dispatchedByUser   User     @relation("DispatchedByUser", fields: [dispatchedByUserId], references: [id])
+  dispatchedAt       DateTime @default(now())
+
+  arrivedAt DateTime?
+
+  deliveredByUserId  String?
+  deliveredByUser    User?     @relation("DeliveredByUser", fields: [deliveredByUserId], references: [id])
+  deliveredAt        DateTime?
+  receiverCiVerified String?
+  deliveryNotes     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items      ShipmentItem[]
+  statusLogs ShipmentStatusLog[]
+
+  @@index([destinationBranchId, status])
+  @@index([guideNumber])
+  @@map("shipments")
+}
+
+model ShipmentItem {
+  id          String   @id @default(uuid())
+  shipmentId  String
+  shipment    Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  quantity    Int
+  description String
+  weightKg    Decimal? @db.Decimal(8, 2)
+  subtotal    Decimal  @db.Decimal(10, 2)
+
+  @@map("shipment_items")
+}
+
+model ShipmentStatusLog {
+  id              String          @id @default(uuid())
+  shipmentId      String
+  shipment        Shipment        @relation(fields: [shipmentId], references: [id])
+  previousStatus  ShipmentStatus?
+  newStatus       ShipmentStatus
+  changedByUserId String
+  changedByUser   User            @relation(fields: [changedByUserId], references: [id])
+  branchId        String
+  branch          Branch          @relation(fields: [branchId], references: [id])
+  remarks         String?
+  createdAt       DateTime        @default(now())
+
+  @@map("shipment_status_logs")
+}
