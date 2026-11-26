@@ -6,8 +6,8 @@ import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './infrastructure/guards/jwt-auth.guard';
 
 const jwtSecret = process.env.JWT_SECRET;
-if (!jwtSecret) {
-  throw new Error('JWT_SECRET must be configured.');
+if (!jwtSecret || jwtSecret.length < 16) {
+  throw new Error('JWT_SECRET must be configured (min. 16 characters).');
 }
 
 @Global()
