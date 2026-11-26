@@ -1,16 +1,191 @@
 ---
+import PublicLayout from '../layouts/PublicLayout.astro';
+import PublicTrackingIsland from '../components/islands/PublicTrackingIsland';
+import BranchesIsland from '../components/islands/BranchesIsland';
+
+const steps = [
+  {
+    n: '01',
+    title: 'Cotiza en el mapa',
+    text: 'Elige origen, destino y peso. El precio se calcula al instante, sin crear cuenta.',
+    icon: 'M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7',
+  },
+  {
+    n: '02',
+    title: 'Entrega en sucursal',
+    text: 'Lleva tu encomienda a cualquier oficina y recibe tu guía con código QR.',
+    icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',
+  },
+  {
+    n: '03',
+    title: 'Sigue cada paso',
+    text: 'Consulta el estado con tu número de guía, desde cualquier dispositivo.',
+    icon: 'M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z',
+  },
+  {
+    n: '04',
+    title: 'Recibe con tu C.I.',
+    text: 'El destinatario confirma su identidad al recoger. Tu envío siempre está seguro.',
+    icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+  },
+];
+
+const faqs = [
+  {
+    q: '¿Necesito una cuenta para cotizar o rastrear?',
+    a: 'No. Cotizar y rastrear es libre. La cuenta solo es necesaria para el personal que emite y gestiona guías.',
+  },
+  {
+    q: '¿Cómo se calcula el precio?',
+    a: 'Tarifa base de la ruta más un valor por kilo. Todas las tarifas se cargan en vivo desde nuestro sistema.',
+  },
+  {
+    q: '¿Qué formas de pago existen?',
+    a: 'Pagado en origen, por pagar en destino (se cobra al entregar) y cuenta corporativa con crédito para empresas.',
+  },
+  {
+    q: '¿Cómo recojo mi encomienda?',
+    a: 'Preséntate en la sucursal de destino con tu cédula de identidad. Verificamos tu C.I. antes de entregar.',
+  },
+];
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<PublicLayout title="NORTHSTAR · Encomiendas con seguimiento en tiempo real">
+  <!-- HERO -->
+  <section class="lambo-hero-bg bg-grid-subtle relative overflow-hidden border-b border-white/10 py-14 md:py-20">
+    <svg class="animate-float pointer-events-none absolute -left-10 top-10 h-52 w-52 text-[#0077ff] opacity-20" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+      <polygon points="50,4 92,27 92,73 50,96 8,73 8,27" stroke="currentColor" stroke-width="2" />
+      <polygon points="50,20 78,36 78,64 50,80 22,64 22,36" stroke="currentColor" stroke-width="1" opacity="0.6" />
+    </svg>
+    <svg class="animate-float-slow pointer-events-none absolute -right-12 bottom-6 h-64 w-64 text-[#8b5cf6] opacity-20" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+      <polygon points="50,4 92,27 92,73 50,96 8,73 8,27" stroke="currentColor" stroke-width="2" />
+      <polygon points="50,20 78,36 78,64 50,80 22,64 22,36" stroke="currentColor" stroke-width="1" opacity="0.6" />
+    </svg>
+
+    <div class="ns-container relative z-10 grid items-center gap-12 xl:grid-cols-12">
+      <div class="animate-fade-up xl:col-span-7">
+        <div class="chip-violet inline-flex items-center gap-2.5 px-4 py-1.5 text-xs font-extrabold uppercase tracking-[0.22em]">
+          <span class="live-dot"></span>
+          Red nacional en tiempo real
+        </div>
+
+        <h1 class="display-heading mt-6 text-5xl sm:text-7xl xl:text-8xl">
+          Tus envíos,<br />
+          <span class="text-gradient">siempre a la vista.</span>
+        </h1>
+
+        <p class="mt-5 max-w-xl text-base font-medium leading-relaxed text-slate-400 md:text-lg">
+          Cotiza tu ruta en el mapa, entrega en sucursal y sigue tu encomienda paso a paso por toda Bolivia.
+        </p>
+
+        <div class="mt-8 flex flex-wrap items-center gap-3">
+          <a href="#mapa" class="ns-btn-primary px-7 py-4">
+            <span>Cotizar ahora</span>
+            <span>→</span>
+          </a>
+          <a href="#rastreo" class="ns-btn-outline px-6 py-4">
+            <span>Rastrear guía</span>
+          </a>
+        </div>
+
+        <p class="mt-6 text-xs font-semibold text-slate-500">
+          ¿Eres parte del equipo?
+          <a href="/login" class="text-[#0077ff] hover:underline">Inicia sesión</a>
+          o
+          <a href="/registro" class="text-[#8b5cf6] hover:underline">crea tu cuenta</a>.
+        </p>
+      </div>
+
+      <div class="xl:col-span-5">
+        <PublicTrackingIsland client:load />
+      </div>
+    </div>
+  </section>
+
+  <!-- CÓMO FUNCIONA -->
+  <section class="py-16">
+    <div class="ns-container">
+      <div class="reveal max-w-2xl">
+        <p class="eyebrow">Así de simple</p>
+        <h2 class="display-heading mt-2 text-3xl md:text-5xl">Cuatro pasos, cero complicaciones</h2>
+      </div>
+
+      <div class="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        {steps.map((step, idx) => (
+          <article
+            class="reveal card-interactive relative border border-white/10 bg-[#0b101e] p-6"
+            style={`--reveal-delay: ${idx * 90}ms`}
+          >
+            <span class="absolute right-5 top-4 text-5xl font-bold text-white/5">{step.n}</span>
+            <span class={idx % 2 === 0 ? 'hex-badge' : 'hex-badge hex-badge-violet'}>
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d={step.icon} />
+              </svg>
+            </span>
+            <h3 class="display-heading mt-5 text-2xl">{step.title}</h3>
+            <p class="mt-2 text-sm font-medium leading-relaxed text-slate-400">{step.text}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- MAPA + COTIZADOR + MÉTRICAS EN VIVO -->
+  <div id="mapa" class="scroll-mt-24 border-t border-white/10 py-14">
+    <BranchesIsland mode="carousel" client:load />
+  </div>
+
+  <!-- PREGUNTAS FRECUENTES -->
+  <section class="border-t border-white/10 py-16">
+    <div class="ns-container grid gap-10 xl:grid-cols-12">
+      <div class="reveal xl:col-span-4">
+        <p class="eyebrow">Resolvemos tus dudas</p>
+        <h2 class="display-heading mt-2 text-3xl md:text-5xl">Preguntas frecuentes</h2>
+        <a href="/servicios" class="ns-btn-outline mt-6">
+          <span>Ver todos los servicios</span>
+          <span>→</span>
+        </a>
+      </div>
+
+      <div class="space-y-3 xl:col-span-8">
+        {faqs.map((item, idx) => (
+          <details class="faq reveal" style={`--reveal-delay: ${idx * 70}ms`}>
+            <summary class="flex items-center justify-between gap-4 px-5 py-4 text-base font-bold">
+              <span>{item.q}</span>
+              <svg class="faq-chevron h-5 w-5 shrink-0 text-[#0077ff]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <p class="faq-body px-5 pb-5 text-sm font-medium leading-relaxed text-slate-400">{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- LLAMADO FINAL -->
+  <section class="pb-16">
+    <div class="ns-container">
+      <div class="reveal relative overflow-hidden border border-[#0077ff]/40 bg-gradient-to-br from-[#0077ff]/15 via-transparent to-[#8b5cf6]/15 p-8 md:p-12">
+        <div class="relative z-10 flex flex-wrap items-center justify-between gap-6">
+          <div>
+            <p class="eyebrow">Para el equipo NORTHSTAR</p>
+            <h2 class="display-heading mt-2 text-3xl md:text-5xl">Gestiona envíos desde tu panel</h2>
+            <p class="mt-2 max-w-xl text-sm font-medium text-slate-400">
+              Emisión de guías, despacho, entregas, caja y reportes. Todo en un solo lugar.
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-3">
+            <a href="/login" class="ns-btn-primary px-7 py-4">
+              <span>Iniciar sesión</span>
+              <span>→</span>
+            </a>
+            <a href="/registro" class="ns-btn-outline px-6 py-4">
+              <span>Crear cuenta</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</PublicLayout>
