@@ -1,7 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {
-  SHIPMENT_REPOSITORY,
-} from '../../domain/ports/shipment.repository.port';
+import { SHIPMENT_REPOSITORY } from '../../domain/ports/shipment.repository.port';
 import type {
   RegisterShipmentInput,
   ShipmentRepositoryPort,

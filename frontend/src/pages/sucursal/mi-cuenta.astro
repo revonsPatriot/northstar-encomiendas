@@ -1,0 +1,8 @@
+---
+import BranchLayout from '../../layouts/BranchLayout.astro';
+import AccountIsland from '../../components/islands/AccountIsland';
+---
+
+<BranchLayout title="Mi Cuenta">
+  <AccountIsland client:only="react" />
+</BranchLayout>

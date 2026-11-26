@@ -1,0 +1,165 @@
+---
+import PublicLayout from '../layouts/PublicLayout.astro';
+
+const showDemo = import.meta.env.DEV;
+
+const benefits = [
+  { title: 'Emisión en segundos', text: 'Registra guías con tarifa automática y ticket QR.', icon: 'M13 10V3L4 14h7v7l9-11h-7z' },
+  { title: 'Control de caja', text: 'Arqueo diario y cobros en origen y destino.', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V7m0 1v8m0 0v1' },
+  { title: 'Trazabilidad total', text: 'Cada cambio de estado queda registrado.', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
+];
+---
+
+<PublicLayout title="Iniciar sesión · NORTHSTAR">
+  <section class="lambo-hero-bg bg-grid-subtle py-12 md:py-20">
+    <div class="ns-container grid items-center gap-12 xl:grid-cols-12">
+      <!-- Mensaje -->
+      <div class="animate-fade-up hidden xl:col-span-6 xl:block">
+        <p class="eyebrow">Portal del equipo</p>
+        <h1 class="display-heading mt-3 text-6xl xl:text-7xl">
+          Bienvenido<br /><span class="text-gradient">de vuelta.</span>
+        </h1>
+        <p class="mt-4 max-w-md text-base font-medium text-slate-400">
+          Ingresa con tu cédula de identidad para gestionar la operación de tu sucursal.
+        </p>
+
+        <ul class="mt-9 space-y-4">
+          {benefits.map((item, idx) => (
+            <li class="animate-fade-up flex items-center gap-4" style={`animation-delay: ${200 + idx * 120}ms`}>
+              <span class={idx % 2 === 0 ? 'hex-badge' : 'hex-badge hex-badge-violet'}>
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d={item.icon} />
+                </svg>
+              </span>
+              <div>
+                <p class="text-sm font-extrabold uppercase tracking-wider">{item.title}</p>
+                <p class="text-sm font-medium text-slate-400">{item.text}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Formulario -->
+      <div class="xl:col-span-6">
+        <div class="ns-panel animate-fade-up mx-auto w-full max-w-xl p-8 shadow-2xl md:p-10">
+          <span class="eyebrow">Acceso seguro</span>
+          <h2 class="display-heading mt-1 text-4xl">Iniciar sesión</h2>
+
+          <form id="login-form" class="mt-7 space-y-5" novalidate>
+            <label class="block text-xs font-extrabold uppercase tracking-[0.16em] text-slate-400">
+              Cédula de identidad
+              <input id="login-ci" name="ci" required autocomplete="username" inputmode="text" placeholder="Ej. 1000001" class="ns-input mt-2 py-3.5 text-base" />
+            </label>
+
+            <label class="block text-xs font-extrabold uppercase tracking-[0.16em] text-slate-400">
+              Contraseña
+              <div class="relative mt-2">
+                <input id="login-password" name="password" type="password" required autocomplete="current-password" placeholder="••••••••" class="ns-input py-3.5 pr-20 text-base" />
+                <button type="button" id="toggle-password" class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold uppercase text-[#0077ff] hover:underline" aria-label="Mostrar u ocultar contraseña">Mostrar</button>
+              </div>
+            </label>
+
+            <label class="flex items-center gap-2 text-xs font-bold uppercase text-slate-400">
+              <input id="remember-ci" type="checkbox" class="accent-[#0077ff]" />
+              Recordar mi C.I. en este equipo
+            </label>
+
+            <p id="login-error" role="alert" class="animate-fade-in hidden border border-red-500/30 bg-red-950/30 p-3 text-sm font-semibold text-red-300"></p>
+
+            <button id="login-submit" class="ns-btn-primary w-full py-4 text-base">
+              <span id="login-label">Entrar al sistema</span>
+              <span>→</span>
+            </button>
+          </form>
+
+          {showDemo && (
+            <details class="mt-6 border border-white/10 bg-[#050811] p-4">
+              <summary class="cursor-pointer text-xs font-bold uppercase tracking-wider text-slate-400">
+                Cuentas de prueba (solo entorno de desarrollo)
+              </summary>
+              <div class="mt-3 grid gap-2 sm:grid-cols-3">
+                <button type="button" data-quick-ci="1000001" data-quick-pass="Northstar2026*" class="btn-tactile border border-white/15 px-3 py-2 text-left text-xs font-bold uppercase hover:border-[#0077ff]">Admin<span class="block font-medium normal-case text-slate-500">1000001</span></button>
+                <button type="button" data-quick-ci="1500001" data-quick-pass="Northstar2026*" class="btn-tactile border border-white/15 px-3 py-2 text-left text-xs font-bold uppercase hover:border-[#0077ff]">Encargado<span class="block font-medium normal-case text-slate-500">1500001</span></button>
+                <button type="button" data-quick-ci="2000002" data-quick-pass="Northstar2026*" class="btn-tactile border border-white/15 px-3 py-2 text-left text-xs font-bold uppercase hover:border-[#0077ff]">Operador<span class="block font-medium normal-case text-slate-500">2000002</span></button>
+              </div>
+            </details>
+          )}
+
+          <p class="mt-7 border-t border-white/10 pt-5 text-center text-sm font-medium text-slate-400">
+            ¿Aún no tienes cuenta?
+            <a href="/registro" class="font-bold text-[#8b5cf6] hover:underline">Regístrate aquí</a>
+          </p>
+        </div>
+
+        <p class="mt-5 text-center text-xs font-semibold text-slate-500">
+          <a href="/" class="hover:text-[#0077ff]">← Volver al inicio</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    import { apiFetch, getSessionUser, saveSession } from '../services/api-client';
+    import type { LoginResponse } from '../../../shared/types/shipment.types';
+
+    if (localStorage.getItem('northstar_access_token') && getSessionUser()) {
+      window.location.replace('/sucursal/dashboard');
+    }
+
+    const form = document.querySelector<HTMLFormElement>('#login-form');
+    const errorBox = document.querySelector<HTMLElement>('#login-error');
+    const ciInput = document.querySelector<HTMLInputElement>('#login-ci');
+    const passInput = document.querySelector<HTMLInputElement>('#login-password');
+    const remember = document.querySelector<HTMLInputElement>('#remember-ci');
+    const label = document.querySelector<HTMLElement>('#login-label');
+    const toggle = document.querySelector<HTMLButtonElement>('#toggle-password');
+
+    const savedCi = localStorage.getItem('northstar_last_ci');
+    if (savedCi && ciInput && remember) {
+      ciInput.value = savedCi;
+      remember.checked = true;
+      passInput?.focus();
+    }
+
+    toggle?.addEventListener('click', () => {
+      if (!passInput) return;
+      const show = passInput.type === 'password';
+      passInput.type = show ? 'text' : 'password';
+      toggle.textContent = show ? 'Ocultar' : 'Mostrar';
+    });
+
+    document.querySelectorAll<HTMLButtonElement>('[data-quick-ci]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (ciInput) ciInput.value = btn.dataset.quickCi ?? '';
+        if (passInput) passInput.value = btn.dataset.quickPass ?? '';
+      });
+    });
+
+    form?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const submit = document.querySelector<HTMLButtonElement>('#login-submit');
+      const data = new FormData(form);
+      errorBox?.classList.add('hidden');
+      if (submit) submit.disabled = true;
+      if (label) label.textContent = 'Verificando…';
+      try {
+        const session = await apiFetch<LoginResponse>('/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({ ci: data.get('ci'), password: data.get('password') }),
+        });
+        if (remember?.checked && ciInput) localStorage.setItem('northstar_last_ci', ciInput.value.trim());
+        else localStorage.removeItem('northstar_last_ci');
+        saveSession(session.accessToken, session.user);
+        window.location.href = session.user.role === 'ADMIN_CENTRAL' ? '/sucursal/admin' : '/sucursal/dashboard';
+      } catch (requestError) {
+        if (errorBox) {
+          errorBox.textContent = requestError instanceof Error ? requestError.message : 'No se pudo iniciar sesión.';
+          errorBox.classList.remove('hidden');
+        }
+        if (submit) submit.disabled = false;
+        if (label) label.textContent = 'Entrar al sistema';
+      }
+    });
+  </script>
+</PublicLayout>

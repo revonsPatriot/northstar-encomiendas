@@ -14,6 +14,13 @@ export enum PaymentType {
   CUENTA_CORPORATIVA = 'CUENTA_CORPORATIVA',
 }
 
+export class InvalidShipmentTransitionError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'InvalidShipmentTransitionError';
+  }
+}
+
 export interface ShipmentProps {
   id: string;
   guideNumber: string;
@@ -47,12 +54,22 @@ export class ShipmentEntity {
     return this.isPaid;
   }
 
+  /** Salida desde la sucursal de origen hacia el destino. */
+  dispatch(): void {
+    if (this.status !== ShipmentStatus.REGISTRADO) {
+      throw new InvalidShipmentTransitionError(
+        `No se puede despachar una guía en estado ${this.status}.`,
+      );
+    }
+    this.status = ShipmentStatus.EN_TRANSITO;
+  }
+
   arrive(): void {
     if (
       this.status !== ShipmentStatus.REGISTRADO &&
       this.status !== ShipmentStatus.EN_TRANSITO
     ) {
-      throw new Error(
+      throw new InvalidShipmentTransitionError(
         `No se puede registrar el arribo desde el estado ${this.status}.`,
       );
     }
@@ -62,7 +79,7 @@ export class ShipmentEntity {
 
   deliver(): void {
     if (this.status !== ShipmentStatus.EN_SUCURSAL_DESTINO) {
-      throw new Error(
+      throw new InvalidShipmentTransitionError(
         `No se puede entregar una guía en estado ${this.status}.`,
       );
     }
@@ -74,7 +91,22 @@ export class ShipmentEntity {
     this.status = ShipmentStatus.ENTREGADO;
   }
 
-  registerPayment(): void {
+  cancel(): void {
+    if (
+      this.status !== ShipmentStatus.REGISTRADO &&
+      this.status !== ShipmentStatus.EN_TRANSITO
+    ) {
+      throw new InvalidShipmentTransitionError(
+        `No se puede anular una guía en estado ${this.status}.`,
+      );
+    }
+    this.status = ShipmentStatus.ANULADO;
+  }
+
+  /** Marca la guía como cobrada. Devuelve true si el cobro fue nuevo. */
+  registerPayment(): boolean {
+    if (this.isPaid) return false;
     this.isPaid = true;
+    return true;
   }
 }

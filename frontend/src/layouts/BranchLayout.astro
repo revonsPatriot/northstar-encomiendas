@@ -1,0 +1,279 @@
+---
+import '../styles/global.css';
+
+const { title = 'Panel de sucursal' } = Astro.props;
+
+const links = [
+  { href: '/sucursal/dashboard', label: 'Dashboard', short: 'Dashboard', icon: 'M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z' },
+  { href: '/sucursal/registrar', label: 'Emitir Guía', short: 'Emitir', icon: 'M12 4v16m8-8H4' },
+  { href: '/sucursal/despacho', label: 'Despacho y Arribo', short: 'Despacho', icon: 'M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10h10zm0 0h2m4 0h2v-5l-3-4h-5v9z' },
+  { href: '/sucursal/recepcion', label: 'Entrega en Destino', short: 'Entrega', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
+  { href: '/sucursal/arqueo', label: 'Arqueo de Caja', short: 'Caja', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+  { href: '/sucursal/mi-cuenta', label: 'Mi Cuenta', short: 'Cuenta', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
+  { href: '/sucursal/admin', label: 'Control Central', short: 'Admin', admin: true, icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z' },
+];
+const current = Astro.url.pathname.replace(/\/$/, '');
+---
+
+<!doctype html>
+<html lang="es" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>{title} | NORTHSTAR</title>
+    <script is:inline>
+      (function () {
+        try {
+          var saved = localStorage.getItem('northstar_theme');
+          var theme = saved === 'light' || saved === 'dark' ? saved : 'dark';
+          document.documentElement.setAttribute('data-theme', theme);
+          if (!localStorage.getItem('northstar_access_token') || !localStorage.getItem('northstar_user')) {
+            window.location.replace('/login');
+          }
+        } catch (e) {
+          window.location.replace('/login');
+        }
+      })();
+    </script>
+  </head>
+  <body class="min-h-screen">
+    <div class="flex min-h-screen w-full">
+      <!-- Slidebar lateral colapsable -->
+      <aside
+        id="branch-slidebar"
+        class="hidden w-64 shrink-0 flex-col justify-between border-r border-white/10 bg-[#0b101e] p-5 transition-all duration-300 md:flex"
+      >
+        <div>
+          <div class="mb-8 flex items-center justify-between">
+            <a href="/sucursal/dashboard" class="brand-mark text-xl">
+              <span class="brand-emblem">N</span>
+              <span class="slidebar-text">NORTHSTAR</span>
+            </a>
+            <button
+              type="button"
+              id="collapse-slidebar"
+              title="Colapsar / Expandir barra"
+              class="text-slate-400 hover:text-[#0077ff]"
+            >
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="slidebar-text mb-6 border-l-2 border-[#0077ff] bg-[#050811] p-3">
+            <p id="session-user-name" class="truncate text-sm font-bold uppercase">Operador</p>
+            <div class="mt-1 flex items-center justify-between text-[11px]">
+              <span id="session-user-role" class="font-bold uppercase text-[#0077ff]">ROL</span>
+              <span id="session-user-ci" class="text-slate-500"></span>
+            </div>
+          </div>
+
+          <nav class="space-y-1.5 text-xs font-bold uppercase tracking-[0.14em]">
+            {links.map((link) => (
+              <a
+                hidden={link.admin}
+                data-admin={link.admin ? '' : undefined}
+                class:list={[
+                  'flex items-center gap-3 border-l-2 px-3.5 py-3 transition',
+                  current === link.href
+                    ? 'border-[#0077ff] bg-[#0077ff]/15 text-[#0077ff] font-extrabold'
+                    : 'border-transparent text-slate-400 hover:border-white/40 hover:bg-white/5 hover:text-white',
+                ]}
+                aria-current={current === link.href ? 'page' : undefined}
+                href={link.href}
+                title={link.label}
+              >
+                <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d={link.icon} />
+                </svg>
+                <span class="slidebar-text truncate">{link.label}</span>
+              </a>
+            ))}
+          </nav>
+        </div>
+
+        <div class="space-y-2 border-t border-white/10 pt-4">
+          <a href="/" class="flex items-center gap-3 px-3.5 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-slate-400 transition hover:text-[#0077ff]">
+            <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span class="slidebar-text">Portal Público</span>
+          </a>
+          <button
+            id="logout"
+            class="btn-tactile flex w-full items-center gap-3 px-3.5 py-2.5 text-left text-xs font-bold uppercase tracking-[0.14em] text-red-400 transition hover:bg-red-950/30"
+          >
+            <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            <span class="slidebar-text">Cerrar Sesión</span>
+          </button>
+        </div>
+      </aside>
+
+      <div class="flex min-w-0 flex-1 flex-col">
+        <header class="sticky top-0 z-30 border-b border-white/10 bg-[#0b101e]/95 px-5 py-3.5 backdrop-blur md:px-10">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+              <div>
+                <p class="eyebrow">NORTHSTAR · CONTROL OPERATIVO</p>
+                <h1 class="display-heading text-2xl md:text-3xl">{title}</h1>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3">
+              <div id="admin-branch-switcher-wrap" class="hidden items-center gap-2 border border-white/15 bg-[#050811] px-3 py-1.5">
+                <span class="text-[10px] font-black uppercase tracking-wider text-[#0077ff]">SUCURSAL:</span>
+                <select
+                  id="admin-branch-switcher"
+                  aria-label="Cambiar sucursal activa"
+                  class="bg-transparent text-xs font-bold uppercase outline-none"
+                >
+                  <option value="">Cargando...</option>
+                </select>
+              </div>
+
+              <span id="operator-branch-badge" class="border border-white/15 bg-[#050811] px-3 py-1.5 text-xs font-bold uppercase text-[#0077ff]">
+                Sucursal
+              </span>
+
+              <button
+                type="button"
+                id="branch-theme-toggle"
+                aria-label="Cambiar tema claro u oscuro"
+                class="hex-btn"
+                title="Cambiar tema Light / Dark"
+              >
+                <svg id="branch-theme-sun" class="hidden h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="4" />
+                  <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+                </svg>
+                <svg id="branch-theme-moon" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <nav class="mt-3 flex gap-2 overflow-x-auto pb-1 text-sm md:hidden">
+            {links.map((link) => (
+              <a
+                hidden={link.admin}
+                data-admin={link.admin ? '' : undefined}
+                class:list={[
+                  'whitespace-nowrap border px-3 py-1.5 text-xs font-bold uppercase',
+                  current === link.href ? 'border-[#0077ff] bg-[#0077ff] text-white' : 'border-white/15',
+                ]}
+                href={link.href}
+              >
+                {link.short}
+              </a>
+            ))}
+            <button id="logout-mobile" class="whitespace-nowrap border border-red-500/40 px-3 py-1.5 text-xs font-bold uppercase text-red-300">
+              Salir
+            </button>
+          </nav>
+        </header>
+
+        <main class="w-full flex-1 px-5 py-6 md:px-10 md:py-8">
+          <slot />
+        </main>
+      </div>
+    </div>
+
+    <script>
+      import { clearSession, getSessionUser, saveSession } from '../services/api-client';
+      import { listBranches } from '../services/shipment.service';
+      import type { AuthUser } from '../../../shared/types/shipment.types';
+
+      function syncThemeUI() {
+        const current = document.documentElement.getAttribute('data-theme') || 'dark';
+        const sun = document.querySelector('#branch-theme-sun');
+        const moon = document.querySelector('#branch-theme-moon');
+        if (current === 'light') {
+          sun?.classList.remove('hidden');
+          moon?.classList.add('hidden');
+        } else {
+          sun?.classList.add('hidden');
+          moon?.classList.remove('hidden');
+        }
+      }
+
+      syncThemeUI();
+
+      document.querySelector('#branch-theme-toggle')?.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme') || 'dark';
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('northstar_theme', next);
+        syncThemeUI();
+      });
+
+      const slidebar = document.querySelector('#branch-slidebar');
+      document.querySelector('#collapse-slidebar')?.addEventListener('click', () => {
+        slidebar?.classList.toggle('w-64');
+        slidebar?.classList.toggle('w-20');
+        document.querySelectorAll('.slidebar-text').forEach((el) => {
+          el.classList.toggle('hidden');
+        });
+      });
+
+      const user = getSessionUser<AuthUser>();
+      const nameEl = document.querySelector('#session-user-name');
+      const roleEl = document.querySelector('#session-user-role');
+      const ciEl = document.querySelector('#session-user-ci');
+      const branchBadge = document.querySelector<HTMLElement>('#operator-branch-badge');
+      const switcherWrap = document.querySelector<HTMLElement>('#admin-branch-switcher-wrap');
+      const switcher = document.querySelector<HTMLSelectElement>('#admin-branch-switcher');
+
+      if (user) {
+        if (nameEl) nameEl.textContent = user.fullName;
+        if (roleEl) roleEl.textContent = user.role.replaceAll('_', ' ');
+        if (ciEl) ciEl.textContent = `C.I. ${user.ci}`;
+      }
+
+      if (user?.role === 'ADMIN_CENTRAL') {
+        document.querySelectorAll<HTMLElement>('[data-admin]').forEach((el) => {
+          el.hidden = false;
+        });
+      }
+
+      listBranches()
+        .then((branches) => {
+          if (!user) return;
+          const activeBranch = branches.find((b) => b.id === user.branchId) ?? branches[0];
+          if (branchBadge && activeBranch) {
+            branchBadge.textContent = `${activeBranch.code} · ${activeBranch.name}`;
+          }
+          if (user.role === 'ADMIN_CENTRAL' && switcherWrap && switcher) {
+            switcherWrap.classList.remove('hidden');
+            switcherWrap.classList.add('flex');
+            if (branchBadge) branchBadge.classList.add('hidden');
+            switcher.innerHTML = branches
+              .map(
+                (b) =>
+                  `<option value="${b.id}" ${b.id === user.branchId ? 'selected' : ''}>${b.code} · ${b.name}</option>`,
+              )
+              .join('');
+            switcher.addEventListener('change', () => {
+              const token = localStorage.getItem('northstar_access_token');
+              if (token && switcher.value) {
+                saveSession(token, { ...user, branchId: switcher.value });
+                window.location.reload();
+              }
+            });
+          }
+        })
+        .catch(() => undefined);
+
+      for (const id of ['#logout', '#logout-mobile']) {
+        document.querySelector(id)?.addEventListener('click', () => {
+          clearSession();
+          window.location.href = '/login';
+        });
+      }
+    </script>
+  </body>
+</html>

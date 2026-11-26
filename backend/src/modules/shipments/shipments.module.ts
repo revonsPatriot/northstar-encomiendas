@@ -3,12 +3,15 @@ import { ConfirmPickupUseCase } from './application/use-cases/confirm-pickup.use
 import { DispatchManifestUseCase } from './application/use-cases/dispatch-manifest.use-case';
 import { RegisterShipmentUseCase } from './application/use-cases/register-shipment.use-case';
 import { SHIPMENT_REPOSITORY } from './domain/ports/shipment.repository.port';
-import { ShipmentsController } from './infrastructure/controllers/shipments.controller';
+import {
+  PublicTrackingController,
+  ShipmentsController,
+} from './infrastructure/controllers/shipments.controller';
 import { PrismaShipmentRepository } from './infrastructure/persistence/prisma-shipment.repository';
 import { PrismaService } from './infrastructure/persistence/prisma.service';
 
 @Module({
-  controllers: [ShipmentsController],
+  controllers: [ShipmentsController, PublicTrackingController],
   providers: [
     PrismaService,
     PrismaShipmentRepository,

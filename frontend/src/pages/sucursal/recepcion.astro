@@ -1,0 +1,8 @@
+---
+import BranchLayout from '../../layouts/BranchLayout.astro';
+import PickupDeliveryIsland from '../../components/islands/PickupDeliveryIsland';
+---
+
+<BranchLayout title="Recepción y entrega">
+  <PickupDeliveryIsland client:only="react" />
+</BranchLayout>

@@ -1,0 +1,42 @@
+---
+import BranchLayout from '../../layouts/BranchLayout.astro';
+import DashboardIsland from '../../components/islands/DashboardIsland';
+---
+
+<BranchLayout title="TELEMETRÍA DE SUCURSAL">
+  <DashboardIsland client:only="react" />
+
+  <section class="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    {[
+      ['/sucursal/registrar', '01 · VENTANILLA', 'EMITIR GUÍA', 'M12 4v16m8-8H4'],
+      ['/sucursal/despacho', '02 · MANIFIESTO', 'DESPACHO Y ARRIBO', 'M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10h10zm0 0h2m4 0h2v-5l-3-4h-5v9z'],
+      ['/sucursal/recepcion', '03 · DESTINO', 'ENTREGAR GUÍA', 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'],
+      ['/sucursal/arqueo', '04 · TESORERÍA', 'ARQUEO DE CAJA', 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V7m0 1v8m0 0v1'],
+    ].map(([href, tag, title, icon]) => (
+      <a href={href} class="card-interactive group flex items-center justify-between border border-white/10 bg-[#0d0f14] p-6">
+        <div>
+          <span class="eyebrow">{tag}</span>
+          <h2 class="display-heading mt-2 text-3xl group-hover:text-[#FFB800]">{title}</h2>
+        </div>
+        <span class="hex-btn">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d={icon} />
+          </svg>
+        </span>
+      </a>
+    ))}
+
+    <a
+      hidden
+      data-admin
+      href="/sucursal/admin"
+      class="card-interactive group flex items-center justify-between border border-[#FFB800]/40 bg-[#0d0f14] p-6 sm:col-span-2 xl:col-span-4"
+    >
+      <div>
+        <span class="eyebrow">ADMINISTRACIÓN CENTRAL</span>
+        <h2 class="display-heading mt-1 text-4xl text-[#FFB800]">CONTROL GLOBAL DE ENCOMIENDAS, RUTAS, SUCURSALES Y ROLES</h2>
+      </div>
+      <span class="hex-btn">→</span>
+    </a>
+  </section>
+</BranchLayout>
