@@ -1,0 +1,8 @@
+---
+import BranchLayout from '../../layouts/BranchLayout.astro';
+import AdminIsland from '../../components/islands/AdminIsland';
+---
+
+<BranchLayout title="Administración">
+  <AdminIsland client:only="react" />
+</BranchLayout>
