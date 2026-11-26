@@ -1,0 +1,96 @@
+---
+import PublicLayout from '../layouts/PublicLayout.astro';
+---
+
+<PublicLayout title="Servicios Logísticos · NORTHSTAR">
+  <section class="lambo-hero-bg bg-grid-subtle border-b border-white/10 py-16">
+    <div class="ns-container flex flex-wrap items-end justify-between gap-8">
+      <div class="animate-fade-up">
+        <p class="eyebrow">Ingeniería logística</p>
+        <h1 class="display-heading mt-3 text-5xl sm:text-7xl">
+          Servicios <span class="text-gradient">NORTHSTAR.</span>
+        </h1>
+      </div>
+      <div class="flex gap-3">
+        <a href="/rutas" class="ns-btn-primary">
+          <span>COTIZAR RUTA</span>
+          <span>→</span>
+        </a>
+        <a href="/registro" class="ns-btn-outline">
+          <span>REGISTRAR PERSONAL</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tarjetas visuales con iconos SVG y mínimo texto -->
+  <section class="py-16">
+    <div class="ns-container grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {[
+        {
+          code: '01',
+          tag: 'MODALIDAD',
+          title: 'PAGADO EN ORIGEN',
+          metric: 'EMISIÓN INMEDIATA',
+          icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V7m0 1v8m0 0v1',
+        },
+        {
+          code: '02',
+          tag: 'MODALIDAD',
+          title: 'POR PAGAR DESTINO',
+          metric: 'COBRO EN ENTREGA',
+          icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+        },
+        {
+          code: '03',
+          tag: 'EMPRESAS',
+          title: 'CRÉDITO CORPORATIVO',
+          metric: 'CUPO MENSUAL',
+          icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1',
+        },
+        {
+          code: '04',
+          tag: 'TRAZABILIDAD',
+          title: 'TICKET TÉRMICO QR',
+          metric: 'RASTREO EN VIVO',
+          icon: 'M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z',
+        },
+        {
+          code: '05',
+          tag: 'OPERACIÓN',
+          title: 'DESPACHO Y ARRIBO',
+          metric: 'MANIFIESTO DIGITAL',
+          icon: 'M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10h10zm0 0h2m4 0h2v-5l-3-4h-5v9z',
+        },
+        {
+          code: '06',
+          tag: 'SEGURIDAD',
+          title: 'ENTREGA CON C.I.',
+          metric: 'IDENTIDAD VERIFICADA',
+          icon: 'M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0',
+        },
+      ].map((item, idx) => (
+        <article
+          style={`--reveal-delay: ${idx * 70}ms`}
+          class="reveal card-interactive flex flex-col justify-between border border-white/10 bg-[#0b101e] p-7"
+        >
+          <div class="flex items-center justify-between">
+            <span class="eyebrow">{item.code} · {item.tag}</span>
+            <span class={idx % 2 === 0 ? 'hex-badge' : 'hex-badge hex-badge-violet'}>
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d={item.icon} />
+              </svg>
+            </span>
+          </div>
+
+          <h2 class="display-heading mt-8 text-4xl">{item.title}</h2>
+
+          <div class="mt-6 flex items-center justify-between border-t border-white/10 pt-4">
+            <span class="text-xs font-extrabold uppercase tracking-[0.2em] text-[#FFB800]">{item.metric}</span>
+            <a href="/rutas" class="text-xs font-bold uppercase text-slate-400 hover:text-white">EXPLORAR →</a>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+</PublicLayout>
