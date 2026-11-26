@@ -1,5 +1,11 @@
 import 'dotenv/config';
-import { PrismaClient, UserRole, PaymentType, ShipmentStatus } from '@prisma/client';
+import {
+  PaymentMoment,
+  PaymentType,
+  PrismaClient,
+  ShipmentStatus,
+  UserRole,
+} from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import * as bcrypt from 'bcrypt';
 
@@ -75,12 +81,48 @@ async function main() {
       name: 'Of. Oruro',
       department: 'Oruro',
       address: 'Terminal Interdepartamental Oruro',
-      phones: '',
+      phones: '62745900',
       isOwnOffice: true,
     },
   });
 
-  // 2. Crear Usuarios Operadores por Sucursal (Contraseña por defecto: Northstar2026*)
+  // 2. Rutas interdepartamentales y tarifas reales
+  const routeDefs = [
+    { origin: cbba, dest: scz, basePrice: 35, pricePerKg: 2.5, hours: 10 },
+    { origin: scz, dest: cbba, basePrice: 35, pricePerKg: 2.5, hours: 10 },
+    { origin: cbba, dest: lpz, basePrice: 30, pricePerKg: 2.0, hours: 8 },
+    { origin: lpz, dest: cbba, basePrice: 30, pricePerKg: 2.0, hours: 8 },
+    { origin: cbba, dest: eal, basePrice: 28, pricePerKg: 2.0, hours: 7 },
+    { origin: eal, dest: cbba, basePrice: 28, pricePerKg: 2.0, hours: 7 },
+    { origin: cbba, dest: oru, basePrice: 25, pricePerKg: 1.5, hours: 4 },
+    { origin: oru, dest: cbba, basePrice: 25, pricePerKg: 1.5, hours: 4 },
+    { origin: scz, dest: lpz, basePrice: 50, pricePerKg: 3.5, hours: 16 },
+    { origin: lpz, dest: scz, basePrice: 50, pricePerKg: 3.5, hours: 16 },
+    { origin: lpz, dest: oru, basePrice: 25, pricePerKg: 1.5, hours: 3 },
+    { origin: oru, dest: lpz, basePrice: 25, pricePerKg: 1.5, hours: 3 },
+  ];
+
+  for (const r of routeDefs) {
+    await prisma.route.upsert({
+      where: {
+        originBranchId_destinationBranchId: {
+          originBranchId: r.origin.id,
+          destinationBranchId: r.dest.id,
+        },
+      },
+      update: {},
+      create: {
+        originBranchId: r.origin.id,
+        destinationBranchId: r.dest.id,
+        basePrice: r.basePrice,
+        pricePerKg: r.pricePerKg,
+        estimatedHours: r.hours,
+        isActive: true,
+      },
+    });
+  }
+
+  // 3. Usuarios por rol y sucursal (Contraseña por defecto: Northstar2026*)
   const defaultPasswordHash = await bcrypt.hash('Northstar2026*', 10);
 
   const adminCbba = await prisma.user.upsert({
@@ -91,6 +133,18 @@ async function main() {
       fullName: 'Administrador Central CBBA',
       ci: '1000001',
       role: UserRole.ADMIN_CENTRAL,
+      passwordHash: defaultPasswordHash,
+    },
+  });
+
+  await prisma.user.upsert({
+    where: { ci: '1500001' },
+    update: {},
+    create: {
+      branchId: scz.id,
+      fullName: 'Encargado Sucursal Santa Cruz',
+      ci: '1500001',
+      role: UserRole.ENCARGADO_SUCURSAL,
       passwordHash: defaultPasswordHash,
     },
   });
@@ -107,7 +161,7 @@ async function main() {
     },
   });
 
-  // 3. Clientes de Ejemplo (del recibo físico N° 004154)
+  // 4. Clientes particulares y corporativos
   const remitente = await prisma.customer.upsert({
     where: { ciNit: '4512890' },
     update: {},
@@ -128,7 +182,19 @@ async function main() {
     },
   });
 
-  // 4. Guía de Ejemplo N° 004154 (Cochabamba -> Oruro, POR PAGAR, 1470 Bs)
+  const corpCliente = await prisma.customer.upsert({
+    where: { ciNit: '1020304022' },
+    update: {},
+    create: {
+      ciNit: '1020304022',
+      fullName: 'Importadora Andina S.R.L.',
+      phone: '44501122',
+      isCorporateAccount: true,
+      corporateCreditLimit: 25000.0,
+    },
+  });
+
+  // 5. Guías iniciales reales en distintos estados
   const existingGuide = await prisma.shipment.findUnique({
     where: { guideNumber: '004154' },
   });
@@ -146,11 +212,13 @@ async function main() {
         isPaid: false,
         totalAmount: 1470.0,
         dispatchedByUserId: adminCbba.id,
+        arrivedAt: new Date(),
         items: {
           create: [
             {
               quantity: 12,
               description: 'Cajas + 1 maleta',
+              weightKg: 85,
               subtotal: 1470.0,
             },
           ],
@@ -177,7 +245,66 @@ async function main() {
     });
   }
 
-  console.log('Seed completado: Sucursales, usuarios y guía 004154 creados.');
+  const guide4155 = await prisma.shipment.findUnique({
+    where: { guideNumber: '004155' },
+  });
+
+  if (!guide4155) {
+    const created = await prisma.shipment.create({
+      data: {
+        guideNumber: '004155',
+        originBranchId: cbba.id,
+        destinationBranchId: scz.id,
+        senderId: corpCliente.id,
+        consigneeId: consignatario.id,
+        status: ShipmentStatus.EN_TRANSITO,
+        paymentType: PaymentType.PAGADO_ORIGEN,
+        isPaid: true,
+        totalAmount: 185.0,
+        dispatchedByUserId: adminCbba.id,
+        items: {
+          create: [
+            {
+              quantity: 3,
+              description: 'Cajas de repuestos industriales',
+              weightKg: 60,
+              subtotal: 185.0,
+            },
+          ],
+        },
+        statusLogs: {
+          create: [
+            {
+              previousStatus: null,
+              newStatus: ShipmentStatus.REGISTRADO,
+              changedByUserId: adminCbba.id,
+              branchId: cbba.id,
+              remarks: 'Registro inicial en ventanilla Cochabamba',
+            },
+            {
+              previousStatus: ShipmentStatus.REGISTRADO,
+              newStatus: ShipmentStatus.EN_TRANSITO,
+              changedByUserId: adminCbba.id,
+              branchId: cbba.id,
+              remarks: 'Encomienda despachada desde la sucursal de origen.',
+            },
+          ],
+        },
+      },
+    });
+
+    await prisma.payment.create({
+      data: {
+        shipmentId: created.id,
+        branchId: cbba.id,
+        userId: adminCbba.id,
+        amount: 185.0,
+        moment: PaymentMoment.ORIGEN,
+      },
+    });
+  }
+
+  console.log('Seed completado: Sucursales, rutas, usuarios, clientes y guías creados.');
 }
 
 main()
